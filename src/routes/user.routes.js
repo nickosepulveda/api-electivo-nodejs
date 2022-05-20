@@ -1,15 +1,27 @@
 'use-strict'
 
 const router = require('express').Router();
+const { userService } = require('../services')
 
 // /users/
-router.get('/', function (req, res) {
-    res.send("Listado de todos los usuarios");
+router.get('/', async function (req, res) {
+    let users = await userService.findAll();
+    return res.json(users);
 });
 // CREATE
 // /users/
-router.post('/', function (req, res) { 
-    res.send("Crear un usuario nuevo");
+router.post('/', async function (req, res) { 
+    try {
+        let body = req.body;
+        let data = await userService.create(body);
+        
+        if (data.error) {
+            return res.status(400).json(data.message);
+        }
+        return res.status(201).json(data);
+    } catch (err) {
+        return res.status(500).json(err)
+    }
 });
 // READ
 // /users/:id

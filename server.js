@@ -11,7 +11,7 @@ const server = http.createServer(app);
 
 app.use(express.json());
 
-require('./src/routes')(app)
+require('./src/routes')(app);
 
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);

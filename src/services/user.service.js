@@ -1,11 +1,32 @@
+'use-strict'
+
+const { userRepo } = require('../data')
+
 const UserService = () => {
-    const findAllUsers = () => {
-        return [];
+    const findAllUsers = async () => {
+        return await userRepo.findAll();
     }
 
     // create new user on database
-    const createUser = (data) => {
-        return data;
+    const createUser = async ({ name, email, password }) => {
+        try {
+            if (!name) {
+                console.error("UserService.createUser name is empty")
+                return { error: true, message: "name is required" }
+            }
+            if (!email) {
+                console.error("UserService.createUser email is empty")
+                return { error: true, message: "email is required" }
+            }
+            if (!password) {
+                console.error("UserService.createUser password is empty")
+                return { error: true, message: "password is required" }
+            }
+
+            return await userRepo.create({ name, email, password });
+        } catch (error) {
+            return Promise.reject({ error: true, message: error })
+        }
     }
     // find user on database
     const findUser = (id) => {
