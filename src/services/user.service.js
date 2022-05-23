@@ -4,7 +4,11 @@ const { userRepo } = require('../data')
 
 const UserService = () => {
     const findAllUsers = async () => {
-        return await userRepo.findAll();
+        try {
+            return await userRepo.findAll();
+        } catch (error) {
+            return Promise.reject({ error: true, message: error })
+        }
     }
 
     // create new user on database
@@ -25,7 +29,7 @@ const UserService = () => {
 
             return await userRepo.create({ name, email, password });
         } catch (error) {
-            return Promise.reject({ error: true, message: error })
+            return Promise.reject({ message: error })
         }
     }
     // find user on database

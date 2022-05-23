@@ -1,37 +1,43 @@
 'use-strict'
 
 const mysql = require('mysql');
+const provider = require('./providers/postgres_provider');
 
 const UserRepo = () => {
-    const connection = mysql.createConnection({
-        host: process.env.DB_HOSTNAME,
-        port: process.env.DB_PORT,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_DATABASE
-    });
-
     const findAllUsers = async () => {
-        return new Promise((resolve, reject) => {
-            connection.query('SELECT * FROM users', function (error, results, fields) {
-                if (error) reject(error);
-                
-                resolve(results);
-            });
-        })
+        try {
+            // con MySQL providers
+            // return await provider.query("SELECT * FROM users");
+
+            // con PostgresProvider providers
+            let users = await provider.query("SELECT * FROM users");
+            return users.rows;
+        } catch (err) {
+            console.error(err)
+            Promise.reject(err)
+        }
     }
     const createUser = async ({ name, email, password }) => {
-        return new Promise((resolve, reject) => {
-            let query = mysql.format("INSERT INTO users(name, email, password) VALUES (?, ?, ?)", [name, email, password]);
+        try {
+            // con MySQL providers
+            // let sql = mysql.format("INSERT INTO users(name, email, password) VALUES (?, ?, ?)", [name, email, password]);
 
-            connection.query(query, function (error, result, fields) {
-                if (error) reject(error);
+            // con MySQL providers
+            // return result.affectedRows > 0 ? {
+            //     id: result.insertId, name, email, password
+            // } : null;
 
-                resolve(result.affectedRows > 0 ? {
-                    id: result.insertId, name, email, password
-                } : null);
-            });
-        })
+            // con PostgresProvider providers
+            let sql = mysql.format("INSERT INTO users(name, email, password) VALUES (?, ?, ?) RETURNING id", [name, email, password]);
+            const result = await provider.query(sql);
+            return result.rowCount > 0 ? {
+                id: result.rows[0].id, name, email, password
+            } : null;
+
+        } catch (err) {
+            console.error(err)
+            Promise.reject(err)
+        }
     }
 
     return {
