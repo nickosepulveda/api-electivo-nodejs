@@ -1,11 +1,13 @@
 'use-strict'
 
 const router = require('express').Router();
-const { userService } = require('../services')
+const { userService } = require('../services');
+const { authToken } = require('./_helpers');
 
 // /users/
-router.get('/', async function (req, res) {
+router.get('/', authToken, async function (req, res) {
     try {
+        console.log(req.authData)
         let users = await userService.findAll();
         return res.json(users);
     }catch (err) {
